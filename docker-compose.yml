@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - favorite-movies-network
+    environment:
+      - MONGO_INITDB_DATABASE=moviesdb
+
+  favorite-movies-app:
+    build: .
+    container_name: favorite-movies-app
+    restart: always
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mongodb
+    networks:
+      - favorite-movies-network
+    environment:
+      - SPRING_DATA_MONGODB_HOST=mongodb
+      - SPRING_DATA_MONGODB_PORT=27017
+      - SPRING_DATA_MONGODB_DATABASE=moviesdb
+
+networks:
+  favorite-movies-network:
+    driver: bridge
+
+volumes:
+  mongodb_data: 
